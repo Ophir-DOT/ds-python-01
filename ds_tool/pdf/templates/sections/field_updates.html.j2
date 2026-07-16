@@ -1,0 +1,34 @@
+{# Section 5.3 — Workflow Field Update actions scoped to this object. #}
+<h3>5.3 Field update details</h3>
+{% if spec.field_updates %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Field</th>
+      <th>Operation</th>
+      <th>Value</th>
+      <th>Notify assignee</th>
+      <th>Re-evaluate WF rules</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fu in spec.field_updates %}
+    <tr>
+      <td>{{ fu.name or fu.api_name }}</td>
+      <td>{{ fu.field or "" }}</td>
+      <td>{{ fu.operation or "" }}</td>
+      <td>{{ fu.value or "" }}</td>
+      <td>
+        {% if fu.notify_assignee is none %}{% elif fu.notify_assignee %}Yes{% else %}No{% endif %}
+      </td>
+      <td>
+        {% if fu.reevaluate_workflow_rules is none %}{% elif fu.reevaluate_workflow_rules %}Yes{% else %}No{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No field update actions on this object.</p>
+{% endif %}

@@ -1,0 +1,21 @@
+<h3>3.6 Tab Settings</h3>
+{% if spec.tab_visibilities %}
+<table>
+  <thead>
+    <tr>
+      <th>Profile / Permission set</th>
+      <th>Visibility</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for tv in spec.tab_visibilities %}
+    <tr>
+      <td>{{ tv.profile }}</td>
+      <td>{{ tv.visibility }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No tab settings.</p>
+{% endif %}

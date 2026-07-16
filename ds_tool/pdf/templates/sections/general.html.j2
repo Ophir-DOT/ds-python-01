@@ -1,0 +1,18 @@
+<section class="general">
+  <h2>1. General</h2>
+  <table>
+    <tbody>
+      <tr><th>API name</th><td>{{ spec.general.api_name }}</td></tr>
+      <tr><th>Label</th><td>{{ spec.general.label }}</td></tr>
+      <tr><th>Plural label</th><td>{{ spec.general.plural_label }}</td></tr>
+      <tr><th>Sharing model</th><td>{{ spec.general.sharing_model or "—" }}</td></tr>
+      <tr><th>Field history tracking</th>
+          <td>{{ "Enabled" if spec.general.history_tracking_enabled else "Disabled" }}</td></tr>
+      {% if spec.general.custom_settings_extended_history is not none %}
+      <tr><th>Extended history (custom settings)</th>
+          <td>{{ "Yes" if spec.general.custom_settings_extended_history else "No" }}</td></tr>
+      {% endif %}
+      <tr><th>Description</th><td>{{ spec.general.description or "—" }}</td></tr>
+    </tbody>
+  </table>
+</section>

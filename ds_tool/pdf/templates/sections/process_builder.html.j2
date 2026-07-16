@@ -1,0 +1,32 @@
+{# Section 5.7 — Process Builder flows on this object (processType Workflow/InvocableProcess). #}
+<section class="process-builder">
+  <h3>5.7 Process Builder</h3>
+  {% if spec.process_builders %}
+  <table>
+    <thead>
+      <tr>
+        <th>API name</th>
+        <th>Label</th>
+        <th>Status</th>
+        <th>Trigger object</th>
+        <th>Criteria</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pb in spec.process_builders %}
+      <tr>
+        <td>{{ pb.api_name }}</td>
+        <td>{{ pb.label }}</td>
+        <td>{{ pb.status or "" }}</td>
+        <td>{{ pb.trigger_object or "" }}</td>
+        <td>{{ pb.criteria or "" }}</td>
+        <td>{% if pb.actions %}{% for action in pb.actions %}{{ action }}{% if not loop.last %}<br>{% endif %}{% endfor %}{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No process builders on this object.</p>
+  {% endif %}
+</section>

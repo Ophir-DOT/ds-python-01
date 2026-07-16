@@ -1,0 +1,31 @@
+{# Section 3.5 — FlexiPage (Lightning record page) assignments scoped to this
+   object, joined from CustomApplication action/profile overrides. #}
+<section class="lightning-pages">
+  <h2>3.5 Lightning page assignment</h2>
+  {% if spec.lightning_pages %}
+  <table>
+    <thead>
+      <tr>
+        <th>App</th>
+        <th>Profile</th>
+        <th>Record type</th>
+        <th>Form factor</th>
+        <th>Lightning page</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for la in spec.lightning_pages %}
+      <tr>
+        <td>{{ la.app }}</td>
+        <td>{{ la.profile or "— (default)" }}</td>
+        <td>{{ la.record_type or "—" }}</td>
+        <td>{{ la.form_factor }}</td>
+        <td>{{ la.flexipage }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No Lightning page assignments for this object.</p>
+  {% endif %}
+</section>

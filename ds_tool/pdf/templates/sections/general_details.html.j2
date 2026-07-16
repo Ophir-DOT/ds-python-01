@@ -1,0 +1,83 @@
+<section class="general-details">
+  <h2>5. General Details</h2>
+
+  <h3>5.1 Validation rules</h3>
+  {% if spec.validation_rules %}
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Active</th><th>Error message</th><th>Error location</th><th>Condition</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      {% for vr in spec.validation_rules %}
+      <tr>
+        <td>{{ vr.api_name }}</td>
+        <td>{{ "Yes" if vr.active else "No" }}</td>
+        <td>{{ vr.error_message or "" }}</td>
+        <td>{{ vr.error_location or "" }}</td>
+        <td><code>{{ vr.error_condition or "" }}</code></td>
+        <td>{{ vr.description or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No validation rules.</p>
+  {% endif %}
+
+  <h3>5.2 Workflow rules</h3>
+  {% if spec.workflows %}
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Active</th><th>Trigger</th><th>Criteria</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      {% for wf in spec.workflows %}
+      <tr>
+        <td>{{ wf.api_name }}</td>
+        <td>{{ "Yes" if wf.active else "No" }}</td>
+        <td>{{ wf.trigger_type or "" }}</td>
+        <td>{{ wf.criteria or "" }}</td>
+        <td>{{ wf.description or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No workflow rules.</p>
+  {% endif %}
+
+  {% include "sections/field_updates.html.j2" %}
+  {% include "sections/email_alerts.html.j2" %}
+  {% include "sections/email_templates.html.j2" %}
+  {% include "sections/apex_triggers.html.j2" %}
+  {% include "sections/process_builder.html.j2" %}
+  {% include "sections/search_layouts.html.j2" %}
+  {% include "sections/compact_layouts.html.j2" %}
+  {% include "sections/page_layouts.html.j2" %}
+  {% include "sections/sharing.html.j2" %}
+
+  <h3>5.12 Flows</h3>
+  {% if spec.flows %}
+  <table>
+    <thead>
+      <tr><th>API name</th><th>Label</th><th>Type</th><th>Status</th><th>Description</th><th>Package state</th></tr>
+    </thead>
+    <tbody>
+      {% for fl in spec.flows %}
+      <tr>
+        <td>{{ fl.api_name }}</td>
+        <td>{{ fl.label }}</td>
+        <td>{{ fl.process_type or "" }}</td>
+        <td>{{ fl.status or "" }}</td>
+        <td>{{ fl.description or "" }}</td>
+        <td>{{ fl.package_state or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No flows triggered on this object.</p>
+  {% endif %}
+
+  {% include "sections/field_sets.html.j2" %}
+</section>

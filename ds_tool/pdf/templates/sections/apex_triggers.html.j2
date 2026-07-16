@@ -1,0 +1,32 @@
+{# Section 5.6 — Apex triggers on this object (Tooling SOQL by TableEnumOrId). #}
+<section class="apex-triggers">
+  <h3>5.6 Apex triggers</h3>
+  {% if spec.apex_triggers %}
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>API version</th>
+        <th>Events</th>
+        <th>Classification</th>
+        <th>Code length</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tr in spec.apex_triggers %}
+      <tr>
+        <td>{{ tr.name }}</td>
+        <td>{{ tr.status or "" }}</td>
+        <td>{{ tr.api_version or "" }}</td>
+        <td>{{ tr.events | join(", ") }}</td>
+        <td>{{ tr.classification or "" }}</td>
+        <td>{{ tr.code_length if tr.code_length is not none else "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No Apex triggers on this object.</p>
+  {% endif %}
+</section>

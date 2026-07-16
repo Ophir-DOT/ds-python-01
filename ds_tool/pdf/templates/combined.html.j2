@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Combined Design Specification</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="cover">
+    <h1>Combined Design Specification</h1>
+    <p class="api-name">{{ specs | length }} object{{ "" if specs|length == 1 else "s" }}</p>
+    <ul class="cover-toc">
+      {% for spec in specs %}
+        <li>{{ spec.general.label }} <span style="color:#6b7280">({{ spec.general.api_name }})</span></li>
+      {% endfor %}
+    </ul>
+    <dl class="cover-meta">
+      <dt>Generated</dt>
+      <dd>{{ generated_at }}</dd>
+      {% if instance_url %}
+        <dt>Org URL</dt>
+        <dd><a href="{{ instance_url }}">{{ instance_url }}</a></dd>
+      {% endif %}
+      {% if org_id %}
+        <dt>Org ID</dt>
+        <dd>{{ org_id }}</dd>
+      {% endif %}
+    </dl>
+  </header>
+
+  {# Each object renders its full per-object report, starting on a fresh page.
+     Section partials read `spec` from the loop variable via Jinja's inherited
+     include context. #}
+  {% for spec in specs %}
+    <div class="object-report">
+      <header class="object-cover">
+        <h1>{{ spec.general.label }}</h1>
+        <p class="api-name">{{ spec.general.api_name }}</p>
+      </header>
+      {% include "sections/general.html.j2" %}
+      {% include "sections/record_types.html.j2" %}
+      {% include "sections/fields.html.j2" %}
+      {% include "sections/picklists_per_rt.html.j2" %}
+      {% include "sections/permissions.html.j2" %}
+      {% include "sections/tab_settings.html.j2" %}
+      {% include "sections/lightning_pages.html.j2" %}
+      {% include "sections/lifecycle.html.j2" %}
+      {% include "sections/general_details.html.j2" %}
+    </div>
+  {% endfor %}
+</body>
+</html>

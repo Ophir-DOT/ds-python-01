@@ -1,0 +1,65 @@
+<section class="fields">
+  <h2>2. Fields</h2>
+  {# Two-row-per-field layout (matches 4.1 / 4.2 lifecycle tables): the main
+     row carries the short attributes; references / picklist values / formula
+     stack into an optional detail row beneath. Otherwise a single field with
+     a 200-value picklist would force `table-layout: auto` to widen the
+     Details column to fit, squeezing every other column character-per-line. #}
+  {% if spec.fields %}
+  <table class="fields-table">
+    <thead>
+      <tr>
+        <th>API name</th>
+        <th>Label</th>
+        <th>Type</th>
+        <th>Classification</th>
+        <th>Required</th>
+        <th>Unique</th>
+        <th>Ext&nbsp;ID</th>
+        <th>History</th>
+        <th>Default value</th>
+        <th>Help text</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in spec.fields %}
+      <tr class="field-main">
+        <td>{{ f.api_name }}</td>
+        <td>{{ f.label }}</td>
+        <td>{{ f.type }}{% if f.length %} ({{ f.length }}){% endif %}</td>
+        <td>{{ f.classification or "" }}</td>
+        <td>{{ "Yes" if f.required else "" }}</td>
+        <td>{{ "Yes" if f.unique else "" }}</td>
+        <td>{{ "Yes" if f.external_id else "" }}</td>
+        <td>{{ "Yes" if f.history_tracked else "" }}</td>
+        <td>{{ f.default_value or "" }}</td>
+        <td>{{ f.help_text or "" }}</td>
+      </tr>
+      {% if f.reference_to or f.picklist_values or f.formula %}
+      <tr class="field-detail">
+        <td colspan="10">
+          {% if f.reference_to %}
+            <div><em>&rarr; {{ f.reference_to | join(', ') }}</em></div>
+          {% endif %}
+          {% if f.picklist_values %}
+            <div class="picklist-values">
+              <strong>{{ f.picklist_values | length }} value{{ "s" if f.picklist_values | length != 1 else "" }}:</strong>
+              {{ f.picklist_values | join(', ') }}
+            </div>
+          {% endif %}
+          {% if f.formula %}
+            <div class="formula">
+              <strong>Formula:</strong>
+              <code>{{ f.formula }}</code>
+            </div>
+          {% endif %}
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No fields found.</p>
+  {% endif %}
+</section>

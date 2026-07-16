@@ -1,0 +1,50 @@
+{# Section 5.11 — Sharing Rules & OWD for this object. #}
+<h3>5.11 Sharing rules &amp; OWD</h3>
+{% if spec.sharing %}
+<table>
+  <thead>
+    <tr>
+      <th>Internal access</th>
+      <th>External access</th>
+      {# grantAccessUsingHierarchies: present for custom objects with non-Public OWD;
+         absent (None) for standard objects and Public OWD — rendered as "—" in that case. #}
+      <th>Grant Access Using Hierarchies</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ spec.sharing.owd_internal or "—" }}</td>
+      <td>{{ spec.sharing.owd_external or "—" }}</td>
+      <td>{% if spec.sharing.grant_access_using_hierarchies is none %}—{% elif spec.sharing.grant_access_using_hierarchies %}Yes{% else %}No{% endif %}</td>
+    </tr>
+  </tbody>
+</table>
+{% if spec.sharing.rules %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Criteria</th>
+      <th>Shared with</th>
+      <th>Access level</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rule in spec.sharing.rules %}
+    <tr>
+      <td>{{ rule.name }}</td>
+      <td>{{ rule.rule_type or "" }}</td>
+      <td>{{ rule.criteria or "" }}</td>
+      <td>{{ rule.shared_with or "" }}</td>
+      <td>{{ rule.access_level or "" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No sharing rules defined.</p>
+{% endif %}
+{% else %}
+<p class="empty">No sharing configuration.</p>
+{% endif %}

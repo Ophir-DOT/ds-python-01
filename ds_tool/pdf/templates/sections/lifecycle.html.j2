@@ -1,0 +1,221 @@
+{# Section 4 — Life Cycle. Mirrors legacy Apex Ctrl_CMP_Configuration_Report.cls:2635-3022.
+   Data comes from CompSuite custom objects; if the org doesn't have CompSuite
+   installed, spec.life_cycle.compsuite_installed == False and the whole section
+   collapses to a single "not applicable" line (page numbering stays stable). #}
+<section class="lifecycle">
+  <h2>4. Life Cycle</h2>
+
+  {% if spec.life_cycle is none %}
+    <p class="empty">Life cycle data was not collected for this object.</p>
+  {% elif not spec.life_cycle.compsuite_installed %}
+    <p class="empty">CompSuite package not detected in this org — Life Cycle section not applicable.</p>
+  {% else %}
+
+    <h3>4.1 Life cycle — general</h3>
+    {# Layout note: the long-content fields (Lock fields, Mandatory fields,
+       Change fields) frequently hold CSVs of full field API names. Keeping
+       them as inline columns shrank every column to ~14mm and shredded headers
+       one character per line. Instead, each transition emits a compact
+       header row of short attributes plus an optional detail row beneath it
+       that spans the full width for the long-content fields. #}
+    {% if spec.life_cycle.transitions %}
+      <table class="lifecycle-table">
+        <thead>
+          <tr>
+            <th>Record type</th>
+            <th>Idx</th>
+            <th>Transition</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Button</th>
+            <th>E-sig</th>
+            <th>Lock&nbsp;attach.</th>
+            <th>Skip&nbsp;approval</th>
+            <th>Dependency</th>
+            <th>Xact</th>
+            <th>Change Checkbox Fields</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in spec.life_cycle.transitions %}
+            <tr class="lifecycle-main">
+              <td>{{ t.record_type or "—" }}</td>
+              <td>{{ t.index if t.index is not none else "" }}</td>
+              <td>{{ t.transition_label }}</td>
+              <td>{{ t.source_state }}</td>
+              <td>{{ t.destination_state }}</td>
+              <td>{{ t.button_style or "" }}</td>
+              <td>{{ "Yes" if t.needs_e_signature else "No" }}</td>
+              <td>{{ "Yes" if t.lock_attachments else "No" }}</td>
+              <td>{{ "Yes" if t.skip_approval else "No" }}</td>
+              <td>{{ t.dependency_on_related_forms or "—" }}</td>
+              <td>
+                {% if t.xact is none %}—{% else %}{{ "Yes" if t.xact else "No" }}{% endif %}
+              </td>
+              {# WI-09: Change Checkbox Fields column — sourced from transition.change_fields (list[str]). #}
+              <td>{{ t.change_fields | join(", ") if t.change_fields else "No" }}</td>
+            </tr>
+            {% if t.lock_fields or t.mandatory_fields %}
+              <tr class="lifecycle-detail">
+                <td colspan="12">
+                  {% if t.lock_fields %}
+                    <div><strong>Lock fields:</strong> {{ t.lock_fields }}</div>
+                  {% endif %}
+                  {% if t.mandatory_fields %}
+                    <div><strong>Mandatory fields:</strong> {{ t.mandatory_fields | join(", ") }}</div>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">N/A</p>
+    {% endif %}
+
+    <h3>4.2 Life cycle — approval process</h3>
+    {# Same two-row layout as 4.1: short attributes in the main row, long-content
+       columns (manageable states, approver filters, lock fields, rejection
+       template) stacked into a detail row beneath. #}
+    {% if spec.life_cycle.approval_processes %}
+      <table class="lifecycle-table">
+        <thead>
+          <tr>
+            <th>Record type</th>
+            <th>Idx</th>
+            <th>Transition</th>
+            <th>Approval init</th>
+            <th>Skip&nbsp;start</th>
+            <th>Rejected state</th>
+            <th>Has&nbsp;last&nbsp;approval</th>
+            <th>Min&nbsp;approvers</th>
+            {# WI-05: Three new columns for §4.2. #}
+            <th>Reviewers</th>
+            <th>Reject Action Lock Fields</th>
+            <th>Approver Filters</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in spec.life_cycle.approval_processes %}
+            <tr class="lifecycle-main">
+              <td>{{ a.record_type or "—" }}</td>
+              <td>{{ a.index if a.index is not none else "" }}</td>
+              <td>{{ a.transition_label }}</td>
+              <td>{{ a.name }}</td>
+              <td>{{ "Yes" if a.skip_start_action else "No" }}</td>
+              <td>{{ a.rejected_state or "—" }}</td>
+              <td>{{ "Yes" if a.has_last_approval else "No" }}</td>
+              <td>{{ a.minimum_approvers if a.minimum_approvers is not none else "0" }}</td>
+              {# WI-05 — Reviewers: no dedicated field on LifeCycleApprovalProcessInit;
+                 the CompSuite SOQL does not surface a separate reviewers list.
+                 Rendered as "--" until the data source is identified and a model
+                 field is added. #}
+              <td>--</td>
+              {# WI-05 — sourced from a.reject_lock_fields (CompSuite__Reject_Lock_Fields__c). #}
+              <td>{{ a.reject_lock_fields or "No" }}</td>
+              {# WI-05 — sourced from a.approver_filters (resolved group names from CompSuite__Groups__c). #}
+              <td>{{ a.approver_filters or "No" }}</td>
+            </tr>
+            {% if a.manageable_states or a.rejection_email_template %}
+              <tr class="lifecycle-detail">
+                <td colspan="11">
+                  {% if a.manageable_states %}
+                    <div><strong>Manageable states:</strong> {{ a.manageable_states | join(", ") }}</div>
+                  {% endif %}
+                  {% if a.rejection_email_template %}
+                    <div><strong>Rejection email template:</strong> {{ a.rejection_email_template }}</div>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">N/A</p>
+    {% endif %}
+
+    <h3>4.3 Life cycle permissions</h3>
+    {% set related = spec.life_cycle.related_profile_names %}
+    {% if spec.life_cycle.permissions and related %}
+      {# Chunk by profile/permset columns to match 3.x section pagination style. #}
+      {% for chunk in profile_chunks(related) %}
+        <p class="chunk-label">
+          Profiles {{ loop.index }} of {{ loop.length }}
+          ({{ chunk|length }} of {{ related|length }} shown)
+        </p>
+        <table class="perm">
+          <thead>
+            <tr>
+              <th class="name">Record type</th>
+              <th class="name">Idx</th>
+              <th class="name">Transition</th>
+              {% for name in chunk %}
+                <th class="crud" style="min-width:22mm">{{ name }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in spec.life_cycle.permissions %}
+              <tr>
+                <td>{{ p.record_type or "—" }}</td>
+                <td>{{ p.index if p.index is not none else "" }}</td>
+                <td>{{ p.transition_label }}</td>
+                {% for name in chunk %}
+                  <td class="crud">{{ "Yes" if name in p.profile_or_permset_names else "No" }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
+    {% else %}
+      <p class="empty">N/A</p>
+    {% endif %}
+
+    <h3>4.4 Life cycle — auto-populate dates</h3>
+    {% if spec.life_cycle.auto_populate_dates %}
+      <table class="perm">
+        <thead>
+          <tr>
+            <th>Record type</th>
+            <th>Idx</th>
+            <th>Transition</th>
+            <th>Source</th>
+            <th>Destination</th>
+            <th>Field 1</th>
+            <th>Field 2</th>
+            <th>Field 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in spec.life_cycle.auto_populate_dates %}
+            <tr>
+              <td>{{ d.record_type or "—" }}</td>
+              <td>{{ d.index if d.index is not none else "" }}</td>
+              <td>{{ d.transition_label }}</td>
+              <td>{{ d.source_state }}</td>
+              <td>{{ d.destination_state }}</td>
+              {% for i in range(3) %}
+                {% if i < d.fields|length %}
+                  {% set field_label = d.fields[i][0] %}
+                  {% set avoid = d.fields[i][1] %}
+                  <td>
+                    {{ field_label }}
+                    {% if avoid %}<div style="font-size:7pt;color:#6b7280">Update the field only if blank</div>{% endif %}
+                  </td>
+                {% else %}
+                  <td></td>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">There are no 'Dates Auto-Populate' defined in any of the state transitions.</p>
+    {% endif %}
+
+  {% endif %}
+</section>

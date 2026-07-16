@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ds-tool"
+version = "0.1.0"
+description = "Salesforce Design Specification PDF generator (Python rewrite)"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Dot Compliance" }]
+license = { text = "Proprietary" }
+dependencies = [
+    "click>=8.1",
+    "simple-salesforce>=1.12",
+    "zeep>=4.2",
+    "httpx[http2]>=0.27",
+    "jinja2>=3.1",
+    "weasyprint>=60.0",
+    "pydantic>=2.5",
+    "rich>=13.7",
+    "pyside6>=6.6",
+    "openpyxl>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "responses>=0.25",
+    "ruff>=0.4",
+    "pyinstaller>=6.6",
+]
+
+[project.scripts]
+ds-tool = "ds_tool.cli:main"
+
+[project.gui-scripts]
+ds-tool-gui = "ds_tool.gui.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ds_tool*"]
+
+[tool.setuptools.package-data]
+"ds_tool.pdf" = ["templates/*.html.j2", "templates/sections/*.html.j2", "templates/*.css"]
+"ds_tool.gui" = ["assets/*.png", "assets/*.svg", "assets/fonts/*.ttf"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

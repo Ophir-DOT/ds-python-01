@@ -1,0 +1,26 @@
+{# Section 2.1.1 — picklist values active per record type. Populated from
+   readMetadata("RecordType", ...) in record_types.py. #}
+<section class="picklists-per-rt">
+  <h2>2.1.1 Picklist values per record type</h2>
+  {% set rts_with_picklists = spec.record_types | selectattr('picklist_values') | list %}
+  {% if rts_with_picklists %}
+    {% for rt in rts_with_picklists %}
+      <h3>{{ rt.label }} <span style="font-weight:normal;color:#6b7280">({{ rt.api_name }})</span></h3>
+      <table>
+        <thead>
+          <tr><th>Picklist field</th><th>Values</th></tr>
+        </thead>
+        <tbody>
+          {% for field_name, values in rt.picklist_values.items() %}
+          <tr>
+            <td>{{ field_name }}</td>
+            <td>{{ values | join(", ") }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+  {% else %}
+    <p class="empty">No record-type-specific picklist values configured.</p>
+  {% endif %}
+</section>

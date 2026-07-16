@@ -1,0 +1,271 @@
+/* Print stylesheet for the Design Specification PDF.
+ *
+ * Replaces the SF tool's hard-coded inline `width:30%/40%/44%` styles
+ * (Ctrl_CMP_Configuration_Report.cls ~lines 4750-4970) with a responsive,
+ * named-page layout. The permissions section uses landscape A4 and
+ * `table-layout: auto` so columns size to content; long sets of profiles
+ * are chunked into stacked tables of <= 6 columns each (see permissions.html.j2).
+ */
+
+/* Per spec: at least 1" (2.54 cm) margin on every side. */
+@page {
+  size: A4 portrait;
+  margin: 1in;
+  @top-left {
+    content: string(doc-title);
+    font: 9pt "Helvetica", sans-serif;
+    color: #666;
+  }
+}
+
+@page permissions {
+  size: A4 landscape;
+  margin: 1in;
+}
+
+html, body {
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-size: 10pt;
+  color: #1f2937;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* On-screen HTML preview: mirror the 1" print margin so the browser view
+ * matches what the printed PDF will look like. The @page rule above already
+ * handles PDF/print; this only affects browser display. */
+@media screen {
+  body {
+    max-width: 8.5in;
+    margin: 1in auto;
+    padding: 0 1in;
+    box-sizing: content-box;
+  }
+}
+
+h1 {
+  font-size: 28pt;
+  margin: 0 0 6mm 0;
+  string-set: doc-title content();
+}
+h2 { font-size: 18pt; margin: 8mm 0 3mm 0; }
+h3 { font-size: 13pt; margin: 6mm 0 2mm 0; color: #111827; }
+h4 { font-size: 11pt; margin: 4mm 0 1mm 0; color: #374151; }
+
+header.cover {
+  page-break-after: always;
+  padding-top: 60mm;
+  text-align: center;
+}
+header.cover .api-name {
+  font-family: "Courier New", monospace;
+  color: #6b7280;
+}
+
+/* Combined-report cover: list of objects bundled in this file. */
+ul.cover-toc {
+  list-style: none;
+  padding: 0;
+  margin: 8mm auto 0 auto;
+  max-width: 120mm;
+  text-align: left;
+  font-size: 12pt;
+}
+ul.cover-toc li {
+  padding: 1mm 0;
+  border-bottom: 0.3pt solid #e5e7eb;
+}
+
+/* Combined-report provenance: when the file was generated and from which org. */
+dl.cover-meta {
+  margin: 12mm auto 0 auto;
+  max-width: 120mm;
+  text-align: left;
+  font-size: 10pt;
+  color: #6b7280;
+}
+dl.cover-meta dt {
+  font-weight: 600;
+  color: #374151;
+}
+dl.cover-meta dd {
+  margin: 0 0 3mm 0;
+  font-family: "Courier New", monospace;
+  word-break: break-all;
+}
+dl.cover-meta dd a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+/* Per-object sub-cover inside a combined report — always starts a new page. */
+.object-report {
+  page-break-before: always;
+}
+header.object-cover {
+  padding-top: 40mm;
+  text-align: center;
+  page-break-after: always;
+}
+header.object-cover h1 {
+  font-size: 22pt;
+  margin: 0 0 4mm 0;
+}
+header.object-cover .api-name {
+  font-family: "Courier New", monospace;
+  color: #6b7280;
+}
+
+section {
+  page-break-inside: avoid;
+  margin-top: 6mm;
+}
+
+section.permissions {
+  page: permissions;
+  page-break-before: always;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  margin: 2mm 0 4mm 0;
+}
+
+th, td {
+  border: 0.3pt solid #d1d5db;
+  padding: 1.5mm 2mm;
+  vertical-align: top;
+  word-break: break-word;
+  font-size: 9pt;
+}
+
+thead th {
+  background: #f3f4f6;
+  font-weight: 600;
+  text-align: left;
+}
+
+tbody tr:nth-child(even) td { background: #fafafa; }
+
+/* The leftmost "field" / "object" name column in chunked permissions tables. */
+table.perm th.name, table.perm td.name {
+  width: 38mm;
+  min-width: 38mm;
+  background: #f9fafb;
+  font-weight: 500;
+  /* Names can wrap between words but never split a single word into vertical
+   * characters when the column is squeezed by many adjacent value columns. */
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Tight CRUD column header for object-permissions tables. */
+table.perm th.crud { width: 14mm; text-align: center; font-size: 8pt; }
+table.perm td.crud { text-align: center; }
+
+.empty {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.chunk-label {
+  font-size: 8pt;
+  color: #6b7280;
+  margin-top: 4mm;
+}
+
+/* §2.1.1 — picklist values per record type. The default `word-break: break-word`
+ * + auto layout squeezed the first column down to ~2 characters wide because
+ * the second column (the comma-joined value list) is often a single very long
+ * "word". Pin the field-name column wide enough that API names flow on one or
+ * two lines instead of one letter per row. */
+section.picklists-per-rt table {
+  table-layout: fixed;
+}
+section.picklists-per-rt table th:first-child,
+section.picklists-per-rt table td:first-child {
+  width: 55mm;
+  min-width: 55mm;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Fields table: picklist values and formula content render inline (no
+ * collapsible disclosures) so the printed spec is self-contained — a reader
+ * looking at the PDF can't expand a closed disclosure. Long content (large
+ * picklists, formulas, reference lists) lives in a `tr.field-detail` row
+ * spanning the full table width so it cannot widen the value columns. */
+table.fields-table tr.field-main td {
+  border-bottom: none;
+}
+table.fields-table tr.field-detail td {
+  border-top: 0.3pt dashed #e5e7eb;
+  padding-top: 1mm;
+  padding-bottom: 2mm;
+  background: #fafafa;
+  font-size: 8pt;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.picklist-values, .formula {
+  font-size: 8pt;
+  color: #374151;
+  margin-top: 1mm;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.picklist-values strong, .formula strong {
+  color: #111827;
+  margin-right: 1mm;
+}
+.formula code {
+  display: block;
+  white-space: pre-wrap;
+  font-size: 8pt;
+  margin-top: 0.5mm;
+}
+
+/* Lifecycle (4.1, 4.2): main row carries short attributes; detail row stacks
+ * wide-content fields beneath. Visually pair the two as a single logical row
+ * (no border between, shared background). */
+table.lifecycle-table {
+  table-layout: auto;
+}
+table.lifecycle-table th {
+  font-size: 8pt;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+table.lifecycle-table td {
+  font-size: 8.5pt;
+  vertical-align: top;
+}
+table.lifecycle-table tr.lifecycle-main td {
+  border-bottom: none;
+}
+table.lifecycle-table tr.lifecycle-detail td {
+  border-top: 0.3pt dashed #e5e7eb;
+  padding-top: 1mm;
+  padding-bottom: 2mm;
+  background: #fafafa;
+  font-size: 8pt;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+table.lifecycle-table tr.lifecycle-detail strong {
+  color: #374151;
+  font-weight: 600;
+  margin-right: 1mm;
+}
+table.lifecycle-table tr.lifecycle-detail div {
+  margin: 0.5mm 0;
+  line-height: 1.35;
+}
+/* Keep alternating zebra striping aligned per transition pair, not per row. */
+table.lifecycle-table tr.lifecycle-main td,
+table.lifecycle-table tr.lifecycle-detail td {
+  background-clip: padding-box;
+}

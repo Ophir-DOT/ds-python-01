@@ -1,0 +1,77 @@
+{# Section 5.10 — Page layout full schema (fields, buttons, related lists). #}
+<h3>5.10 Page layouts</h3>
+{% if spec.page_layouts %}
+{% for layout in spec.page_layouts %}
+<h4>{{ layout.api_name }}</h4>
+
+{% if layout.sections %}
+<table>
+  <thead>
+    <tr>
+      <th>Section</th>
+      <th>Field</th>
+      <th>Position</th>
+      <th>Behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for section in layout.sections %}
+    {% if section.fields %}
+    {% for field in section.fields %}
+    <tr>
+      {% if loop.first %}
+      <td rowspan="{{ section.fields | length }}">{{ section.label or "" }}</td>
+      {% endif %}
+      <td>{{ field.label }}</td>
+      <td>{{ field.position or "" }}</td>
+      <td>{{ field.behavior or "" }}</td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+      <td>{{ section.label or "" }}</td>
+      <td colspan="3"><em>No fields</em></td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% if layout.standard_buttons or layout.custom_buttons or layout.mobile_actions %}
+<p><strong>Standard buttons:</strong>
+  {% if layout.standard_buttons %}{{ layout.standard_buttons | join(", ") }}{% else %}&mdash;{% endif %}
+</p>
+<p><strong>Custom buttons:</strong>
+  {% if layout.custom_buttons %}{{ layout.custom_buttons | join(", ") }}{% else %}&mdash;{% endif %}
+</p>
+<p><strong>Mobile/Lightning actions:</strong>
+  {% if layout.mobile_actions %}{{ layout.mobile_actions | join(", ") }}{% else %}&mdash;{% endif %}
+</p>
+{% endif %}
+
+{% if layout.related_lists %}
+<table>
+  <thead>
+    <tr>
+      <th>Related list</th>
+      <th>Fields</th>
+      <th>Buttons</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rl in layout.related_lists %}
+    <tr>
+      <td>{{ rl.name }}</td>
+      <td>{{ rl.fields | join(", ") }}</td>
+      <td>{{ rl.buttons | join(", ") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+{% endfor %}
+{% else %}
+<p class="empty">No page layouts.</p>
+{% endif %}

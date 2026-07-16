@@ -1,0 +1,23 @@
+# Packaging / build artifacts
+build/
+build_pyi/
+dist/
+*.egg-info/
+
+# Generated reports (runtime output)
+out/
+out_demo/
+out_live/
+
+# UI test recording frames (regenerable; ui_test*.gif/.mp4 may be kept)
+test_recording/*_frames/
+
+# Python caches
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# IDE / tool settings
+.claude/

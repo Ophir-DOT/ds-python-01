@@ -1,0 +1,29 @@
+<section class="record-types">
+  <h2>1.1 Record types</h2>
+  {% if spec.record_types %}
+  <table>
+    <thead>
+      <tr>
+        <th>API name</th>
+        <th>Label</th>
+        <th>Active</th>
+        <th>Business process</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rt in spec.record_types %}
+      <tr>
+        <td>{{ rt.api_name }}</td>
+        <td>{{ rt.label }}</td>
+        <td>{{ "Yes" if rt.active else "No" }}</td>
+        <td>{{ rt.business_process or "" }}</td>
+        <td>{{ rt.description or "" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No record types found.</p>
+  {% endif %}
+</section>

@@ -1,0 +1,24 @@
+{# Section 5.8 — Search layouts for this object (CustomObject metadata). #}
+<h3>5.8 Search layouts</h3>
+{% if spec.search_layouts %}
+<table>
+  <thead>
+    <tr>
+      <th>Layout type</th>
+      <th>Columns</th>
+      <th>Buttons</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for sl in spec.search_layouts %}
+    <tr>
+      <td>{{ sl.layout_type }}</td>
+      <td>{{ sl.columns | join(", ") }}</td>
+      <td>{{ sl.buttons | join(", ") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No search layouts.</p>
+{% endif %}

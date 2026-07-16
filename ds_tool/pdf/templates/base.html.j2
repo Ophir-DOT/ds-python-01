@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ spec.general.label }} — Design Specification</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="cover">
+    <h1>Design Specification</h1>
+    <h2>{{ spec.general.label }}</h2>
+    <p class="api-name">{{ spec.general.api_name }}</p>
+  </header>
+
+  {# Section order matches the legacy Apex report (Ctrl_CMP_Configuration_Report.cls):
+     1. General → 1.1 Record Types → 2. Fields → 2.1.1 Picklists per RT
+     → 3. Profile & Permission Set (incl. 3.4 Layout Assignment) → 3.5 Lightning Pages
+     → 4. Life Cycle → 5. General Details (Validation/Workflows/.../Flows). #}
+  {% include "sections/general.html.j2" %}
+  {% include "sections/record_types.html.j2" %}
+  {% include "sections/fields.html.j2" %}
+  {% include "sections/picklists_per_rt.html.j2" %}
+  {% include "sections/permissions.html.j2" %}
+  {% include "sections/tab_settings.html.j2" %}
+  {% include "sections/lightning_pages.html.j2" %}
+  {% include "sections/lifecycle.html.j2" %}
+  {% include "sections/general_details.html.j2" %}
+</body>
+</html>

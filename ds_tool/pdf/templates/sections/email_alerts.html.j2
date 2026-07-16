@@ -1,0 +1,39 @@
+{# Section 5.4 — WorkflowAlerts scoped to this object. #}
+<section class="email-alerts">
+  <h3>5.4 Email alerts</h3>
+  {% if spec.email_alerts %}
+  <table>
+    <thead>
+      <tr>
+        <th>API name</th>
+        <th>Description</th>
+        <th>From</th>
+        <th>Template</th>
+        <th>Recipients</th>
+        <th>Last Checkbox</th>
+        <th>Protected Component</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ea in spec.email_alerts %}
+      <tr>
+        <td>{{ ea.api_name }}</td>
+        <td>{{ ea.description or "" }}</td>
+        <td>
+          {% if ea.sender_address %}{{ ea.sender_address }}{% endif %}
+          {% if ea.sender_type %}<div style="font-size:7pt;color:#6b7280">{{ ea.sender_type }}</div>{% endif %}
+        </td>
+        <td>{{ ea.template or "" }}</td>
+        <td>{{ ea.recipients | join("; ") }}</td>
+        <td>--</td>
+        <td>
+          {% if ea.protected is none %}{% elif ea.protected %}Yes{% else %}No{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No email alerts on this object.</p>
+  {% endif %}
+</section>

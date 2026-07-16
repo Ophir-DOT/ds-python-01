@@ -1,0 +1,24 @@
+{# Section 5.9 — Compact layouts scoped to this object. #}
+<h3>5.9 Compact layouts</h3>
+{% if spec.compact_layouts %}
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Label</th>
+      <th>Fields</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cl in spec.compact_layouts %}
+    <tr>
+      <td>{{ cl.api_name }}</td>
+      <td>{{ cl.label or "" }}</td>
+      <td>{{ cl.fields | join(", ") }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No compact layouts.</p>
+{% endif %}

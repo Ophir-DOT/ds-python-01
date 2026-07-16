@@ -1,0 +1,46 @@
+{# Section 5.5 — EmailTemplates referenced by the email alerts above. #}
+<section class="email-templates">
+  <h3>5.5 Email templates</h3>
+  {% if spec.email_templates %}
+  <table>
+    <thead>
+      <tr>
+        <th>Developer name</th>
+        <th>Label</th>
+        <th>Folder</th>
+        <th>Type</th>
+        <th>Subject</th>
+        <th>Letterhead ID</th>
+        <th>Email Layout ID</th>
+        <th>Folder ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for et in spec.email_templates %}
+      <tr>
+        <td>{{ et.developer_name }}</td>
+        <td>{{ et.label }}</td>
+        <td>{{ et.folder or "" }}</td>
+        <td>{{ et.template_type or "" }}</td>
+        <td>{{ et.subject or "" }}</td>
+        <td>{{ et.letterhead_id or "" }}</td>
+        <td>{{ et.email_layout_id or "" }}</td>
+        <td>{{ et.folder_id or "" }}</td>
+      </tr>
+      {% if et.body_plain %}
+      <tr class="email-template-body">
+        <td colspan="8">
+          <details>
+            <summary>Plain-text body</summary>
+            <pre class="email-body-plain">{{ et.body_plain | truncate(2000, True, '… [truncated]') }}</pre>
+          </details>
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">No email templates referenced by this object's email alerts.</p>
+  {% endif %}
+</section>

@@ -1,0 +1,36 @@
+{# Section 5.13 — Field sets defined on this object. #}
+<h3>5.13 Field sets</h3>
+{% if spec.field_sets %}
+<table>
+  <thead>
+    <tr>
+      <th>API name</th>
+      <th>Label</th>
+      <th>Description</th>
+      <th>Fields</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for fs in spec.field_sets %}
+    <tr>
+      <td>{{ fs.api_name }}</td>
+      <td>{{ fs.label or "" }}</td>
+      <td>{{ fs.description or "" }}</td>
+      <td>
+        {% if fs.fields %}
+        <ul class="fieldset-fields">
+          {% for field in fs.fields %}
+          <li>{{ field }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <span class="empty">—</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="empty">No field sets.</p>
+{% endif %}

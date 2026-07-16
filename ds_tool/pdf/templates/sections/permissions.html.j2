@@ -1,0 +1,173 @@
+{# Section 3 in the legacy report — Profile & Permission Set.
+
+   Subsection ordering follows the legacy Apex tool (Ctrl_CMP_Configuration_Report.cls):
+     3.1 FLS, 3.2 Object Permissions, 3.3 Record Type Assignment,
+     3.4 Page Layout Assignment.
+   (3.5 Lightning Page Assignment lives in lightning_pages.html.j2 since it
+    needs a different fetch path.)
+
+   The SF tool rendered every profile as a column in a single fixed-width table;
+   once you exceeded ~6 profiles the table overflowed the printable area and
+   columns got clipped. Here we split profiles into chunks of `PROFILE_CHUNK`,
+   render one table per chunk (with the field-name column repeated), and switch
+   to landscape A4 just for this section so even 6 columns have room to breathe.
+#}
+<section class="permissions">
+  <h2>3. Profile &amp; Permission Set</h2>
+
+  {% if not spec.profiles %}
+    <p class="empty">No profiles or permission sets selected.</p>
+  {% else %}
+
+    <h3>3.1 Field-level security</h3>
+    {% set fields = spec.fields | map(attribute='api_name') | list %}
+    {% if fields %}
+      {% for chunk in profile_chunks(spec.profiles) %}
+        <p class="chunk-label">
+          Profiles {{ loop.index }} of {{ loop.length }}
+          ({{ chunk|length }} of {{ spec.profiles|length }} shown)
+        </p>
+        <table class="perm">
+          <thead>
+            <tr>
+              <th class="name">Field</th>
+              {% for prof in chunk %}
+                <th colspan="2" style="text-align:center">{{ prof.label or prof.full_name }}</th>
+              {% endfor %}
+            </tr>
+            <tr>
+              <th class="name"></th>
+              {% for prof in chunk %}
+                <th class="crud">R</th><th class="crud">E</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for field_name in fields %}
+              {% set fqname = spec.general.api_name ~ '.' ~ field_name %}
+              <tr>
+                <td class="name">{{ field_name }}</td>
+                {% for prof in chunk %}
+                  {% set fp = namespace(found=none) %}
+                  {% for p in prof.field_permissions if p.field == fqname %}
+                    {% set fp.found = p %}
+                  {% endfor %}
+                  <td class="crud">{{ "✓" if fp.found and fp.found.readable else ("N/A" if not fp.found else "") }}</td>
+                  <td class="crud">{{ "✓" if fp.found and fp.found.editable else ("N/A" if not fp.found else "") }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endfor %}
+    {% else %}
+      <p class="empty">No fields available for FLS rendering.</p>
+    {% endif %}
+
+    <h3>3.2 Object permissions</h3>
+    {% for chunk in profile_chunks(spec.profiles) %}
+      <p class="chunk-label">
+        Profiles {{ loop.index }} of {{ loop.length }} — {{ chunk[0].label or chunk[0].full_name }}
+        {% if chunk|length > 1 %}…{{ chunk[-1].label or chunk[-1].full_name }}{% endif %}
+      </p>
+      <table class="perm">
+        <thead>
+          <tr>
+            <th class="name">Profile / Permission set</th>
+            <th class="crud">Read</th>
+            <th class="crud">Create</th>
+            <th class="crud">Edit</th>
+            <th class="crud">Delete</th>
+            <th class="crud">View&nbsp;All</th>
+            <th class="crud">Modify&nbsp;All</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for prof in chunk %}
+            {% set op = (prof.object_permissions|first) if prof.object_permissions else none %}
+            <tr>
+              <td class="name">
+                <strong>{{ prof.label or prof.full_name }}</strong>
+                <div style="font-size:7pt;color:#6b7280">{{ prof.kind }}</div>
+              </td>
+              <td class="crud">{{ "✓" if op and op.read else "" }}</td>
+              <td class="crud">{{ "✓" if op and op.create else "" }}</td>
+              <td class="crud">{{ "✓" if op and op.edit else "" }}</td>
+              <td class="crud">{{ "✓" if op and op.delete else "" }}</td>
+              <td class="crud">{{ "✓" if op and op.view_all else "" }}</td>
+              <td class="crud">{{ "✓" if op and op.modify_all else "" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
+
+    <h3>3.3 Record type visibilities</h3>
+    {% set has_rt = spec.profiles | selectattr('record_type_visibilities') | list %}
+    {% if has_rt and spec.record_types %}
+      <table class="perm">
+        <thead>
+          <tr>
+            <th class="name">Profile / Permission set</th>
+            {% for rt in spec.record_types %}
+              <th class="crud" style="min-width:18mm">{{ rt.api_name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for prof in spec.profiles %}
+            <tr>
+              <td class="name">
+                <strong>{{ prof.label or prof.full_name }}</strong>
+                <div style="font-size:7pt;color:#6b7280">{{ prof.kind }}</div>
+              </td>
+              {% for rt in spec.record_types %}
+                {% set key = spec.general.api_name ~ '.' ~ rt.api_name %}
+                <td class="crud">
+                  {% if key in prof.record_type_visibilities %}
+                    {{ "✓" if prof.record_type_visibilities[key] else "No Access" }}
+                  {% else %}
+                    No Access
+                  {% endif %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="empty">No record type visibility settings.</p>
+    {% endif %}
+
+    <h3>3.4 Page layout assignment</h3>
+    {# Pulled from Tooling SOQL on ProfileLayout for the whole org (not just
+       --profiles); see metadata/layouts.py. #}
+    <p class="chunk-label">
+      Note: includes every profile in the org (standard Salesforce profiles
+      such as Chatter External, Analytics Cloud, Contract Manager, and Guest
+      are included for completeness, not only the profiles selected above).
+    </p>
+    {% if spec.layout_assignments %}
+    <table>
+      <thead>
+        <tr>
+          <th>Profile</th>
+          <th>Record type</th>
+          <th>Layout</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for la in spec.layout_assignments %}
+        <tr>
+          <td>{{ la.profile }}</td>
+          <td>{{ la.record_type or "— (default)" }}</td>
+          <td>{{ la.layout }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="empty">No page layout assignments found for this object.</p>
+    {% endif %}
+  {% endif %}
+</section>
